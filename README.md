@@ -1,11 +1,6 @@
-gnome-shell-extensions-template
-===============================
+gnome-shell-extension-tpbat
+===========================
 
 
-A simple, versatile autotools template for developing GNOME Shell extensions
-
-The goal is to make be easy and flexible for new extensions, and even more
-easy for existing extensions that want to adopt autotools to automatically
-build zips and add localization or gsettings.
-
-More documentation to come!
+This extension adds options to control Lenovo ThinkPad's SMAPI/EC interface
+to the battery charger to gnome-shell's battery menu.

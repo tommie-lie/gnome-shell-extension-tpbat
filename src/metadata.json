@@ -1,9 +1,9 @@
 {
-"uuid": "your@uuid.domain",
-"name": "Your extension",
-"description": "What it does",
-"original-author": "your@mail.address",
-"shell-version": [ "3.8" ],   
-"settings-schema": "org.gnome.shell.extensions.yourextension",
-"gettext-domain": "yourextension"
+"uuid": "tpbat@tommie-lie.de",
+"name": "ThinkPad Battery Control",
+"description": "Set ThinkPad battery charge/discharge thresholds.",
+"original-author": "thomas@tommie-lie.de",
+"url": "https://github.com/tommie-lie/gnome-shell-extension-tpbat",
+"shell-version": [ "3.8" ],
+"settings-schema": "org.gnome.shell.extensions.tpbat",
 }
