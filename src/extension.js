@@ -30,7 +30,7 @@ const TpBat = new Lang.Class({
     Name: "tpbat",
 
     _init: function() {
-        this.batCtlViews = [];
+        this.batCtls = [];
     },
     destroy: function() {
         this.emit("destroy");
@@ -38,42 +38,61 @@ const TpBat = new Lang.Class({
     enable: function() {
         global.log("enable");
         
+        // TODO: detect wether ACPI or SMAPI should be used
         // TODO: detect which batteries are actually available
-        this.batCtlViews.push(this.createBatterySubmenu("Battery 1"));
-        this.batCtlViews.push(this.createBatterySubmenu("Battery 2"));
-        
         let batCtl1 = new BatteryControl.BatteryControlACPI();
-        batCtl1.setStartThreshold(5);
+        this.batCtls.push({view: this.createBatterySubmenu("Battery 1", batCtl1), model: batCtl1});
+        let batCtl2 = new BatteryControl.BatteryControlACPI();
+        this.batCtls.push({view: this.createBatterySubmenu("Battery 2", batCtl2), model: batCtl2});
         
         let PowerIndicator = Main.panel.statusArea.battery;
         
-        this.batCtlViews.forEach(Lang.bind(this, function(m) {
-            PowerIndicator.menu.addMenuItem(m);
+        this.batCtls.forEach(Lang.bind(this, function(ctl) {
+            PowerIndicator.menu.addMenuItem(ctl.view);
         }));
     },
     disable: function() {
         global.log("disable");
-        while (this.batCtlViews.length > 0) {
-            let it = this.batCtlViews.pop();
-            it.destroy();
+        while (this.batCtls.length > 0) {
+            let it = this.batCtls.pop();
+            it.view.destroy();
         }
         if (this._slider) {
             this._slider.destroy();
             this._slider = null;
         }
     },
-    createBatterySubmenu: function(title) {
+    createBatterySubmenu: function(title, model) {
         let menuEntry = new PopupMenu.PopupSubMenuMenuItem(title);
         menuEntry.menu.tpbatStartThresh = new PopupLabeledSliderMenuItem("Start Thrsh.", 0.3);
+        menuEntry.menu.tpbatStartThresh.connect("value-changed",
+            Lang.bind(this, function(sender, value) {
+                model.setStartThreshold(Math.round(value * 100));
+            }));
+        
         menuEntry.menu.addMenuItem(menuEntry.menu.tpbatStartThresh);
         menuEntry.menu.tpbatStopThresh = new PopupLabeledSliderMenuItem("Stop Thrsh.", 0.3);
         menuEntry.menu.addMenuItem(menuEntry.menu.tpbatStopThresh);
+        menuEntry.menu.tpbatStopThresh.connect("value-changed",
+            Lang.bind(this, function(sender, value) {
+                model.setStopThreshold(Math.round(value * 100));
+            }));
+
 
         menuEntry.menu.tpbatInhibitCharge = new PopupMenu.PopupSwitchMenuItem("Inhibit Charge");
         menuEntry.menu.addMenuItem(menuEntry.menu.tpbatInhibitCharge);
+        menuEntry.menu.tpbatInhibitCharge.connect("toggled",
+            Lang.bind(this, function(sender, value) {
+                model.setInhibitCharge(value);
+            }));
+        
         menuEntry.menu.tpbatForceDischarge = new PopupMenu.PopupSwitchMenuItem("Force Discharge");
         menuEntry.menu.addMenuItem(menuEntry.menu.tpbatForceDischarge);
-
+        menuEntry.menu.tpbatForceDischarge.connect("toggled",
+            Lang.bind(this, function(sender, value) {
+                model.setForceDischarge(value);
+            }));
+        
         return menuEntry;
     }
 });
