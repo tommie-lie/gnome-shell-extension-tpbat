@@ -4,6 +4,7 @@ const PopupMenu = imports.ui.popupMenu;
 const GLib = imports.gi.GLib;
 const Util = imports.misc.util;
 const St = imports.gi.St;
+const Clutter = imports.gi.Clutter;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const BatteryControl = Me.imports.batteryControl;
 
@@ -19,10 +20,23 @@ const PopupLabeledSliderMenuItem = new Lang.Class({
         
         this._container = new St.Table();
         this._label = new St.Label({text: text});
-        this._container.add(this._label, {row: 0, col: 0});
-        this._container.add(this._slider, {row: 0, col: 1});
-        this.addActor(this._container, {span: 2, expand: true});
+        this._container.add(this._label, {row: 0, col: 0, x_expand: true});
+
+        // force minimum width to the widest text we will display
+        this._valueLabel = new St.Label({text: "100"});
+        this._valueLabel.set_width(this._valueLabel.get_width());
+        this._valueLabel.get_clutter_text().set_x_align(Clutter.ActorAlign.END);
+        this.onValueChanged(this, value);
+        this._container.add(this._valueLabel, {row: 0, col: 1, x_expand: false});
+        
+        this.connect("value-changed", Lang.bind(this, this.onValueChanged));
+        this._container.add(this._slider, {row: 0, col: 2, x_fill: true});
+        this.addActor(this._container, {span: -1, expand: true});
+    },    
+    onValueChanged: function(sender, value) {
+        this._valueLabel.set_text(Math.round(value * 100).toString());
     }
+    
 });
 
 
@@ -64,20 +78,19 @@ const TpBat = new Lang.Class({
     },
     createBatterySubmenu: function(title, model) {
         let menuEntry = new PopupMenu.PopupSubMenuMenuItem(title);
-        menuEntry.menu.tpbatStartThresh = new PopupLabeledSliderMenuItem("Start Thrsh.", 0.3);
+        menuEntry.menu.tpbatStartThresh = new PopupLabeledSliderMenuItem("Start Threshold", 0.3);
         menuEntry.menu.tpbatStartThresh.connect("value-changed",
             Lang.bind(this, function(sender, value) {
                 model.setStartThreshold(Math.round(value * 100));
             }));
         
         menuEntry.menu.addMenuItem(menuEntry.menu.tpbatStartThresh);
-        menuEntry.menu.tpbatStopThresh = new PopupLabeledSliderMenuItem("Stop Thrsh.", 0.3);
+        menuEntry.menu.tpbatStopThresh = new PopupLabeledSliderMenuItem("Stop Threshold", 0.3);
         menuEntry.menu.addMenuItem(menuEntry.menu.tpbatStopThresh);
         menuEntry.menu.tpbatStopThresh.connect("value-changed",
             Lang.bind(this, function(sender, value) {
                 model.setStopThreshold(Math.round(value * 100));
             }));
-
 
         menuEntry.menu.tpbatInhibitCharge = new PopupMenu.PopupSwitchMenuItem("Inhibit Charge");
         menuEntry.menu.addMenuItem(menuEntry.menu.tpbatInhibitCharge);
