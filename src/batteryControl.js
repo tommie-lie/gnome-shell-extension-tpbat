@@ -18,12 +18,26 @@ const BatteryControlACPI = new Lang.Class({
             throw new Error("The battery argument must be 1 or 2.");
         }
     },
+    _callTpacpiBat: function(cmd, value) {
+        if (value == null) {
+            return GLib.spawn_command_line_sync("%s %s %d".format(
+                                            TPACPI_BAT_EXEC,
+                                            cmd,
+                                            this._battery));
+        } else {
+            return GLib.spawn_command_line_sync("%s %s %d %d".format(
+                                            TPACPI_BAT_EXEC,
+                                            cmd,
+                                            this._battery,
+                                            value));
+        }
+    },
     
     getStartThreshold: function() {
         global.log("getStartThreshold");
         
-        [ret, stdout, stderr, status] =
-            GLib.spawn_command_line_sync("%s -g ST %d".format(TPACPI_BAT_EXEC, this._battery));
+        [ret, stdout, stderr, status] = this._callTpacpiBat("-g ST");
+
         if (ret && status == 0) {
             // first number in out string is percentage, parseInt stops at first non-number
             return parseInt(stdout);
@@ -38,8 +52,7 @@ const BatteryControlACPI = new Lang.Class({
     getStopThreshold: function() {
         global.log("getStopThreshold");
 
-        [ret, stdout, stderr, status] =
-            GLib.spawn_command_line_sync("%s -g SP %d".format(TPACPI_BAT_EXEC, this._battery));
+        [ret, stdout, stderr, status] = this._callTpacpiBat("-g SP");
         if (ret && status == 0) {
             // first number in out string is percentage, parseInt stops at first non-number
             return parseInt(stdout);
@@ -54,10 +67,8 @@ const BatteryControlACPI = new Lang.Class({
     getInhibitCharge: function() {
         global.log("getInhibitCharge");
 
-        [ret, stdout, stderr, status] =
-            GLib.spawn_command_line_sync("%s -g IC %d".format(TPACPI_BAT_EXEC, this._battery));
+        [ret, stdout, stderr, status] = this._callTpacpiBat("-g IC");
         if (ret && status == 0) {
-            // first number in out string is percentage, parseInt stops at first non-number
             return (stdout.toString().indexOf("yes") == 0);
         }
         return false;
@@ -69,10 +80,8 @@ const BatteryControlACPI = new Lang.Class({
 
     getForceDischarge: function() {
         global.log("getForceDischarge");
-        [ret, stdout, stderr, status] =
-            GLib.spawn_command_line_sync("%s -g FD %d".format(TPACPI_BAT_EXEC, this._battery));
+        [ret, stdout, stderr, status] = this._callTpacpiBat("-g FD");
         if (ret && status == 0) {
-            // first number in out string is percentage, parseInt stops at first non-number
             return (stdout.toString().indexOf("yes") == 0);
         }
         return true;
