@@ -36,7 +36,6 @@ const PopupLabeledSliderMenuItem = new Lang.Class({
     onValueChanged: function(sender, value) {
         this._valueLabel.set_text(Math.round(value * 100).toString());
     }
-    
 });
 
 
@@ -93,6 +92,14 @@ const TpBat = new Lang.Class({
             }));
 
         menuEntry.menu.tpbatInhibitCharge = new PopupMenu.PopupSwitchMenuItem("Inhibit Charge");
+        // monkey-patch activate function to keep menu open after toggling
+        // function body taken from popupMenu.js:797
+        menuEntry.menu.tpbatInhibitCharge.activate =
+            Lang.bind(menuEntry.menu.tpbatInhibitCharge, function(event) {
+                if (this._switch.actor.mapped) {
+                    this.toggle();
+                }
+            });
         menuEntry.menu.addMenuItem(menuEntry.menu.tpbatInhibitCharge);
         menuEntry.menu.tpbatInhibitCharge.connect("toggled",
             Lang.bind(this, function(sender, value) {
@@ -100,6 +107,14 @@ const TpBat = new Lang.Class({
             }));
         
         menuEntry.menu.tpbatForceDischarge = new PopupMenu.PopupSwitchMenuItem("Force Discharge");
+        // monkey-patch activate function to keep menu open after toggling
+        // function body taken from popupMenu.js:797
+        menuEntry.menu.tpbatForceDischarge.activate =
+            Lang.bind(menuEntry.menu.tpbatForceDischarge, function(event) {
+                if (this._switch.actor.mapped) {
+                    this.toggle();
+                }
+            });
         menuEntry.menu.addMenuItem(menuEntry.menu.tpbatForceDischarge);
         menuEntry.menu.tpbatForceDischarge.connect("toggled",
             Lang.bind(this, function(sender, value) {
