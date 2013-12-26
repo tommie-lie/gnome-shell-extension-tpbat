@@ -29,24 +29,48 @@ const TpBat = new Lang.Class({
     Name: "tpbat",
 
     _init: function() {
+        this.batCtlViews = [];
     },
     destroy: function() {
         this.emit("destroy");
     },
     enable: function() {
-        global.log("asdf");
-
+        global.log("enable");
+        
+        // TODO: detect which batteries are actually available
+        this.batCtlViews.push(this.createBatterySubmenu("Battery 1"));
+        this.batCtlViews.push(this.createBatterySubmenu("Battery 2"));
+        
         let PowerIndicator = Main.panel.statusArea.battery;
-
-        this._slider = new PopupLabeledSliderMenuItem("hello", 0.3);
-        PowerIndicator.menu.addMenuItem(this._slider);
+        
+        this.batCtlViews.forEach(Lang.bind(this, function(m) {
+            PowerIndicator.menu.addMenuItem(m);
+        }));
     },
     disable: function() {
-        global.log("fdsa");
+        global.log("disable");
+        while (this.batCtlViews.length > 0) {
+            let it = this.batCtlViews.pop();
+            it.destroy();
+        }
         if (this._slider) {
             this._slider.destroy();
             this._slider = null;
         }
+    },
+    createBatterySubmenu: function(title) {
+        let menuEntry = new PopupMenu.PopupSubMenuMenuItem(title);
+        menuEntry.menu.tpbatStartThresh = new PopupLabeledSliderMenuItem("Start Thrsh.", 0.3);
+        menuEntry.menu.addMenuItem(menuEntry.menu.tpbatStartThresh);
+        menuEntry.menu.tpbatStopThresh = new PopupLabeledSliderMenuItem("Stop Thrsh.", 0.3);
+        menuEntry.menu.addMenuItem(menuEntry.menu.tpbatStopThresh);
+
+        menuEntry.menu.tpbatInhibitCharge = new PopupMenu.PopupSwitchMenuItem("Inhibit Charge");
+        menuEntry.menu.addMenuItem(menuEntry.menu.tpbatInhibitCharge);
+        menuEntry.menu.tpbatForceDischarge = new PopupMenu.PopupSwitchMenuItem("Force Discharge");
+        menuEntry.menu.addMenuItem(menuEntry.menu.tpbatForceDischarge);
+
+        return menuEntry;
     }
 });
 
