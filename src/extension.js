@@ -5,6 +5,7 @@ const GLib = imports.gi.GLib;
 const Util = imports.misc.util;
 const St = imports.gi.St;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
+const BatteryControl = Me.imports.batteryControl;
 
 
 const PopupLabeledSliderMenuItem = new Lang.Class({
@@ -40,6 +41,9 @@ const TpBat = new Lang.Class({
         // TODO: detect which batteries are actually available
         this.batCtlViews.push(this.createBatterySubmenu("Battery 1"));
         this.batCtlViews.push(this.createBatterySubmenu("Battery 2"));
+        
+        let batCtl1 = new BatteryControl.BatteryControlACPI();
+        batCtl1.setStartThreshold(5);
         
         let PowerIndicator = Main.panel.statusArea.battery;
         
