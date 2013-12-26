@@ -59,8 +59,10 @@ const TpBat = new Lang.Class({
         
         let PowerIndicator = Main.panel.statusArea.battery;
         
+        this._sep = new PopupMenu.PopupSeparatorMenuItem();
+        PowerIndicator.menu.addMenuItem(this._sep, PowerIndicator.menu._getMenuItems().length - 2);
         this.batCtls.forEach(Lang.bind(this, function(ctl) {
-            PowerIndicator.menu.addMenuItem(ctl.view);
+            PowerIndicator.menu.addMenuItem(ctl.view, PowerIndicator.menu._getMenuItems().length - 2);
         }));
     },
     disable: function() {
@@ -68,9 +70,8 @@ const TpBat = new Lang.Class({
             let it = this.batCtls.pop();
             it.view.destroy();
         }
-        if (this._slider) {
-            this._slider.destroy();
-            this._slider = null;
+        if (this._sep) {
+            this._sep.destroy();
         }
     },
     createBatterySubmenu: function(title, model) {
