@@ -54,9 +54,9 @@ const TpBat = new Lang.Class({
         
         // TODO: detect wether ACPI or SMAPI should be used
         // TODO: detect which batteries are actually available
-        let batCtl1 = new BatteryControl.BatteryControlACPI();
+        let batCtl1 = new BatteryControl.BatteryControlACPI(1);
         this.batCtls.push({view: this.createBatterySubmenu("Battery 1", batCtl1), model: batCtl1});
-        let batCtl2 = new BatteryControl.BatteryControlACPI();
+        let batCtl2 = new BatteryControl.BatteryControlACPI(2);
         this.batCtls.push({view: this.createBatterySubmenu("Battery 2", batCtl2), model: batCtl2});
         
         let PowerIndicator = Main.panel.statusArea.battery;
@@ -78,21 +78,21 @@ const TpBat = new Lang.Class({
     },
     createBatterySubmenu: function(title, model) {
         let menuEntry = new PopupMenu.PopupSubMenuMenuItem(title);
-        menuEntry.menu.tpbatStartThresh = new PopupLabeledSliderMenuItem("Start Threshold", 0.3);
+        menuEntry.menu.tpbatStartThresh = new PopupLabeledSliderMenuItem("Start Threshold", model.getStartThreshold() / 100.0);
         menuEntry.menu.tpbatStartThresh.connect("value-changed",
             Lang.bind(this, function(sender, value) {
                 model.setStartThreshold(Math.round(value * 100));
             }));
         
         menuEntry.menu.addMenuItem(menuEntry.menu.tpbatStartThresh);
-        menuEntry.menu.tpbatStopThresh = new PopupLabeledSliderMenuItem("Stop Threshold", 0.3);
+        menuEntry.menu.tpbatStopThresh = new PopupLabeledSliderMenuItem("Stop Threshold", model.getStopThreshold() / 100.0);
         menuEntry.menu.addMenuItem(menuEntry.menu.tpbatStopThresh);
         menuEntry.menu.tpbatStopThresh.connect("value-changed",
             Lang.bind(this, function(sender, value) {
                 model.setStopThreshold(Math.round(value * 100));
             }));
 
-        menuEntry.menu.tpbatInhibitCharge = new PopupMenu.PopupSwitchMenuItem("Inhibit Charge");
+        menuEntry.menu.tpbatInhibitCharge = new PopupMenu.PopupSwitchMenuItem("Inhibit Charge", model.getInhibitCharge());
         // monkey-patch activate function to keep menu open after toggling
         // function body taken from popupMenu.js:797
         menuEntry.menu.tpbatInhibitCharge.activate =
@@ -107,7 +107,7 @@ const TpBat = new Lang.Class({
                 model.setInhibitCharge(value);
             }));
         
-        menuEntry.menu.tpbatForceDischarge = new PopupMenu.PopupSwitchMenuItem("Force Discharge");
+        menuEntry.menu.tpbatForceDischarge = new PopupMenu.PopupSwitchMenuItem("Force Discharge", model.getForceDischarge());
         // monkey-patch activate function to keep menu open after toggling
         // function body taken from popupMenu.js:797
         menuEntry.menu.tpbatForceDischarge.activate =
