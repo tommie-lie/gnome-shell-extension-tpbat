@@ -34,10 +34,7 @@ const BatteryControlACPI = new Lang.Class({
     },
     
     getStartThreshold: function() {
-        global.log("getStartThreshold");
-        
         [ret, stdout, stderr, status] = this._callTpacpiBat("-g ST");
-
         if (ret && status == 0) {
             // first number in out string is percentage, parseInt stops at first non-number
             return parseInt(stdout);
@@ -45,14 +42,11 @@ const BatteryControlACPI = new Lang.Class({
         return 0;
     },
     setStartThreshold: function(value) {
-        global.log("setStartThreshold " + value);
         [ret, stdout, stderr, status] = this._callTpacpiBat("-s ST", value);
         this.emit("start-threshold-changed", value);
     },
 
     getStopThreshold: function() {
-        global.log("getStopThreshold");
-
         [ret, stdout, stderr, status] = this._callTpacpiBat("-g SP");
         if (ret && status == 0) {
             // first number in out string is percentage, parseInt stops at first non-number
@@ -61,14 +55,11 @@ const BatteryControlACPI = new Lang.Class({
         return 0;
     },
     setStopThreshold: function(value) {
-        global.log("setStopThreshold " + value);
         [ret, stdout, stderr, status] = this._callTpacpiBat("-s SP", value);
         this.emit("stop-threshold-changed", value);
     },
 
     getInhibitCharge: function() {
-        global.log("getInhibitCharge");
-
         [ret, stdout, stderr, status] = this._callTpacpiBat("-g IC");
         if (ret && status == 0) {
             return (stdout.toString().indexOf("yes") == 0);
@@ -76,13 +67,11 @@ const BatteryControlACPI = new Lang.Class({
         return false;
     },
     setInhibitCharge: function(value) {
-        global.log("setInhibitCharge " + value);
         [ret, stdout, stderr, status] = this._callTpacpiBat("-s IC", value ? 1 : 0);
         this.emit("inhibit-charge-changed", value);
     },
 
     getForceDischarge: function() {
-        global.log("getForceDischarge");
         [ret, stdout, stderr, status] = this._callTpacpiBat("-g FD");
         if (ret && status == 0) {
             return (stdout.toString().indexOf("yes") == 0);
@@ -90,7 +79,6 @@ const BatteryControlACPI = new Lang.Class({
         return true;
     },
     setForceDischarge: function(value) {
-        global.log("setForceDischarge " + value);
         [ret, stdout, stderr, status] = this._callTpacpiBat("-s FD", value ? 1 : 0);
         this.emit("force-discharge-changed", value);
     },

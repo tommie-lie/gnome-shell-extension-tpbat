@@ -50,8 +50,6 @@ const TpBat = new Lang.Class({
         this.emit("destroy");
     },
     enable: function() {
-        global.log("enable");
-        
         // TODO: detect wether ACPI or SMAPI should be used
         // TODO: detect which batteries are actually available
         let batCtl1 = new BatteryControl.BatteryControlACPI(1);
@@ -66,7 +64,6 @@ const TpBat = new Lang.Class({
         }));
     },
     disable: function() {
-        global.log("disable");
         while (this.batCtls.length > 0) {
             let it = this.batCtls.pop();
             it.view.destroy();
