@@ -78,19 +78,25 @@ const TpBat = new Lang.Class({
     },
     createBatterySubmenu: function(title, model) {
         let menuEntry = new PopupMenu.PopupSubMenuMenuItem(title);
+
         menuEntry.menu.tpbatStartThresh = new PopupLabeledSliderMenuItem("Start Threshold", model.getStartThreshold() / 100.0);
-        menuEntry.menu.tpbatStartThresh.connect("value-changed",
-            Lang.bind(this, function(sender, value) {
-                model.setStartThreshold(Math.round(value * 100));
-            }));
-        
         menuEntry.menu.addMenuItem(menuEntry.menu.tpbatStartThresh);
+
         menuEntry.menu.tpbatStopThresh = new PopupLabeledSliderMenuItem("Stop Threshold", model.getStopThreshold() / 100.0);
         menuEntry.menu.addMenuItem(menuEntry.menu.tpbatStopThresh);
-        menuEntry.menu.tpbatStopThresh.connect("value-changed",
-            Lang.bind(this, function(sender, value) {
-                model.setStopThreshold(Math.round(value * 100));
-            }));
+
+        // Instead of writing the battery settings in the value-changed
+        // signal, do it when the menu closes.
+        // I don't know if many writes to the firmware could damage it over
+        // time and this is definitely faster than ongoing I/O while dragging
+        // the slider.
+        menuEntry.menu.connect("open-state-changed", Lang.bind(this, function(sender, state) {
+            if (!state) {
+                model.setStartThreshold(Math.round(sender.tpbatStartThresh.value * 100));
+                model.setStopThreshold(Math.round(sender.tpbatStopThresh.value * 100));
+            }
+        }));
+
 
         menuEntry.menu.tpbatInhibitCharge = new PopupMenu.PopupSwitchMenuItem("Inhibit Charge", model.getInhibitCharge());
         // monkey-patch activate function to keep menu open after toggling

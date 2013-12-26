@@ -46,6 +46,7 @@ const BatteryControlACPI = new Lang.Class({
     },
     setStartThreshold: function(value) {
         global.log("setStartThreshold " + value);
+        [ret, stdout, stderr, status] = this._callTpacpiBat("-s ST", value);
         this.emit("start-threshold-changed", value);
     },
 
@@ -61,6 +62,7 @@ const BatteryControlACPI = new Lang.Class({
     },
     setStopThreshold: function(value) {
         global.log("setStopThreshold " + value);
+        [ret, stdout, stderr, status] = this._callTpacpiBat("-s SP", value);
         this.emit("stop-threshold-changed", value);
     },
 
@@ -75,6 +77,7 @@ const BatteryControlACPI = new Lang.Class({
     },
     setInhibitCharge: function(value) {
         global.log("setInhibitCharge " + value);
+        [ret, stdout, stderr, status] = this._callTpacpiBat("-s IC", value ? 1 : 0);
         this.emit("inhibit-charge-changed", value);
     },
 
@@ -88,6 +91,7 @@ const BatteryControlACPI = new Lang.Class({
     },
     setForceDischarge: function(value) {
         global.log("setForceDischarge " + value);
+        [ret, stdout, stderr, status] = this._callTpacpiBat("-s FD", value ? 1 : 0);
         this.emit("force-discharge-changed", value);
     },
 });
