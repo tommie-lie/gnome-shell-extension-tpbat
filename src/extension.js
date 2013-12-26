@@ -19,12 +19,13 @@ const PopupLabeledSliderMenuItem = new Lang.Class({
         this.removeActor(this._slider);
         
         this._container = new St.Table();
+
         this._label = new St.Label({text: text});
         this._container.add(this._label, {row: 0, col: 0, x_expand: true});
 
-        // force minimum width to the widest text we will display
         this._valueLabel = new St.Label({text: "100"});
-        this._valueLabel.set_width(this._valueLabel.get_width());
+        // force minimum width to the widest text we will display
+        this._valueLabel.set_width(this._valueLabel.get_clutter_text().get_width());
         this._valueLabel.get_clutter_text().set_x_align(Clutter.ActorAlign.END);
         this.onValueChanged(this, value);
         this._container.add(this._valueLabel, {row: 0, col: 1, x_expand: false});
