@@ -35,7 +35,7 @@ const PopupLabeledSliderMenuItem = new Lang.Class({
         this.addActor(this._container, {span: -1, expand: true});
     },    
     onValueChanged: function(sender, value) {
-        this._valueLabel.set_text(Math.round(value * 100).toString());
+        this._valueLabel.set_text(Math.round(value * 99 + 1).toString());
     }
 });
 
@@ -77,10 +77,10 @@ const TpBat = new Lang.Class({
     createBatterySubmenu: function(title, model) {
         let menuEntry = new PopupMenu.PopupSubMenuMenuItem(title);
 
-        menuEntry.menu.tpbatStartThresh = new PopupLabeledSliderMenuItem("Start Threshold", model.getStartThreshold() / 100.0);
+        menuEntry.menu.tpbatStartThresh = new PopupLabeledSliderMenuItem("Start Threshold", (model.getStartThreshold() - 1) / 99.0);
         menuEntry.menu.addMenuItem(menuEntry.menu.tpbatStartThresh);
 
-        menuEntry.menu.tpbatStopThresh = new PopupLabeledSliderMenuItem("Stop Threshold", model.getStopThreshold() / 100.0);
+        menuEntry.menu.tpbatStopThresh = new PopupLabeledSliderMenuItem("Stop Threshold", (model.getStopThreshold() - 1) / 99.0);
         menuEntry.menu.addMenuItem(menuEntry.menu.tpbatStopThresh);
 
         // Instead of writing the battery settings in the value-changed
@@ -90,8 +90,8 @@ const TpBat = new Lang.Class({
         // the slider.
         menuEntry.menu.connect("open-state-changed", Lang.bind(this, function(sender, state) {
             if (!state) {
-                model.setStartThreshold(Math.round(sender.tpbatStartThresh.value * 100));
-                model.setStopThreshold(Math.round(sender.tpbatStopThresh.value * 100));
+                model.setStartThreshold(Math.round(sender.tpbatStartThresh.value * 99 + 1));
+                model.setStopThreshold(Math.round(sender.tpbatStopThresh.value * 99 + 1));
             }
         }));
 

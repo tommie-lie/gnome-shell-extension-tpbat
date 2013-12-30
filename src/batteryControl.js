@@ -37,11 +37,21 @@ const BatteryControlACPI = new Lang.Class({
         [ret, stdout, stderr, status] = this._callTpacpiBat("-g ST");
         if (ret && status == 0) {
             // first number in out string is percentage, parseInt stops at first non-number
-            return parseInt(stdout);
+            ret = parseInt(stdout);
+            // be symetrical to setStartThreshold: 0 means 100
+            if (ret == 0) {
+                ret = 100;
+            }
+            return ret;
         }
         return 0;
     },
     setStartThreshold: function(value) {
+        // A start theshold of 100 would mean "start immediately" which
+        // the controller actually maps to 0.
+        if (value > 99) {
+            value = 0;
+        }
         [ret, stdout, stderr, status] = this._callTpacpiBat("-s ST", value);
         this.emit("start-threshold-changed", value);
     },
@@ -50,11 +60,21 @@ const BatteryControlACPI = new Lang.Class({
         [ret, stdout, stderr, status] = this._callTpacpiBat("-g SP");
         if (ret && status == 0) {
             // first number in out string is percentage, parseInt stops at first non-number
-            return parseInt(stdout);
+            ret = parseInt(stdout);
+            // be symetrical to setStopThreshold: 0 means 100
+            if (ret == 0) {
+                ret = 100;
+            }
+            return ret;
         }
         return 0;
     },
     setStopThreshold: function(value) {
+        // A stop threshold of 100 would mean "charge until full" which
+        // the controller actually maps to 0.
+        if (value > 99) {
+            value = 0;
+        }
         [ret, stdout, stderr, status] = this._callTpacpiBat("-s SP", value);
         this.emit("stop-threshold-changed", value);
     },
